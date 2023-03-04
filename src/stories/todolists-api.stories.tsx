@@ -145,7 +145,7 @@ export const UpdateTask = () => {
             startDate:"2023-03-02T18:58:50.937",
             status:0
         }
-        taskApi.updateTaskTitle(todolistId,taskId,updatedTask)
+        taskApi.updateTask(todolistId,taskId,updatedTask)
             .then((res) => {
                 setState(res.data)
             })

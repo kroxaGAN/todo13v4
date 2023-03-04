@@ -17,7 +17,14 @@ import {
     changeTodolistTitleAC,
     removeTodolistAC, fetchTodolistsTC
 } from './state/todolists-reducer';
-import { addTaskAC, changeTaskStatusAC, changeTaskTitleAC, removeTaskAC } from './state/tasks-reducer';
+import {
+    addTaskAC,
+    addTaskTC,
+    changeTaskStatusAC,
+    changeTaskTitleAC,
+    removeTaskAC,
+    removeTaskTC, updateTaskTitleTC
+} from './state/tasks-reducer';
 import { useAppDispatch, useAppSelector} from './state/store';
 import {TaskType, TodolistDomainType} from "./api/todolist-api";
 
@@ -40,13 +47,11 @@ function App() {
     },[])
 
     const removeTask = useCallback(function (id: string, todolistId: string) {
-        const action = removeTaskAC(id, todolistId);
-        dispatch(action);
+        dispatch(removeTaskTC(todolistId,id));
     }, []);
 
     const addTask = useCallback(function (title: string, todolistId: string) {
-        const action = addTaskAC(title, todolistId);
-        dispatch(action);
+        dispatch(addTaskTC(todolistId,title));
     }, []);
 
     const changeStatus = useCallback(function (id: string, isDone: boolean, todolistId: string) {
@@ -55,8 +60,8 @@ function App() {
     }, []);
 
     const changeTaskTitle = useCallback(function (id: string, newTitle: string, todolistId: string) {
-        const action = changeTaskTitleAC(id, newTitle, todolistId);
-        dispatch(action);
+        // const action = changeTaskTitleAC(id, newTitle, todolistId);
+        dispatch(updateTaskTitleTC(todolistId,id,newTitle));
     }, []);
 
     const changeFilter = useCallback(function (value: FilterValuesType, todolistId: string) {
