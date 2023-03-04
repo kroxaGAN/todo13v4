@@ -1,5 +1,6 @@
 import React from 'react'
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
+import {FilterValuesType} from "../App";
 
 
 // const settings={
@@ -18,7 +19,7 @@ export const instance=axios.create({
 })
 
 
-export const todolistPI={
+export const todolistAPI={
     getTodolists(){
         return instance.get<TodolistType[]>('todo-lists')
     },
@@ -88,6 +89,9 @@ export type TodolistType={
     "title": string,
     "addedDate": string,
     "order": number
+}
+export type TodolistDomainType=TodolistType &{
+    filter: FilterValuesType
 }
 
 type ResponseType<T={}>={

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import axios from "axios";
-import {taskApi, todolistPI, UpdatedTaskType} from "../api/todolist-api";
+import {taskApi, todolistAPI, UpdatedTaskType} from "../api/todolist-api";
 import {text} from "stream/consumers";
 
 export default {
@@ -19,7 +19,7 @@ export const GetTodolists = () => {
         // здесь мы будем делать запрос и ответ закидывать в стейт.
         // который в виде строки будем отображать в div-ке
         // axios.get('https://social-network.samuraijs.com/api/1.1/todo-lists',settings)
-        todolistPI.getTodolists()
+        todolistAPI.getTodolists()
             .then((res) => {
                 setState(res.data)
             })
@@ -32,7 +32,7 @@ export const CreateTodolist = () => {
     const [title, setTitle] = useState<string>("")
 
     const createTodoHandler=()=>{
-            todolistPI.createTodolist(title)
+            todolistAPI.createTodolist(title)
                 .then((res) => {
                     setState(`made --- ${res.data.data.item.title}`)
                     setTitle('')
@@ -59,7 +59,7 @@ export const DeleteTodolist = () => {
     //         })
     // }, [])
     const deleteTodoHandler=()=>{
-        todolistPI.deleteTodolist(todolistId)
+        todolistAPI.deleteTodolist(todolistId)
             .then((res) => {
                 setState(res.data)
                 setTodolistId('')
@@ -82,13 +82,13 @@ export const UpdateTodolistTitle = () => {
     const [title, setTitle] = useState<string>("")
     const [todolistId, setTodolistId] = useState<string>("")
     useEffect(() => {
-        todolistPI.getTodolists()
+        todolistAPI.getTodolists()
             .then((res) => {
                 setState(res.data)
             })
     }, [])
     const updateTodoHandler=()=>{
-        todolistPI.updateTodolistTitle(todolistId, title)
+        todolistAPI.updateTodolistTitle(todolistId, title)
             .then((res) => {
                 setState(res.data)
                 setTitle('')
