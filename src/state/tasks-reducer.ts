@@ -1,4 +1,3 @@
-import {v1} from 'uuid';
 import {AddTodolistActionType, fetchTodolistsActionType, RemoveTodolistActionType} from './todolists-reducer';
 import {TasksStateType} from '../App';
 import {Dispatch} from "redux";
@@ -131,12 +130,13 @@ export const addTaskTC=(todolistId:string,newTitle:string)=>(dispatch:Dispatch)=
             dispatch(addTaskAC(res.data.data.item,todolistId))
         })
 }
-export const updateTaskTitleTC=(todolistId:string, taskId:string,title:string)=>(dispatch:Dispatch, getState:any)=>{
-    const state=getState()
-    const allTasks=state.tasks
-    const tasks:TaskType[]=allTasks[todolistId]
-    const task=tasks.find(el=>el.id===taskId)
-    console.log(task)
+export const updateTaskTitleTC=(todolistId:string, taskId:string,title:string)=>(dispatch:Dispatch, getState:()=>AppRootStateType)=>{
+    // const state=getState()
+    // const allTasks=state.tasks
+    // const tasks:TaskType[]=allTasks[todolistId]
+    // const task=tasks.find(el=>el.id===taskId)
+    // console.log(task)
+    const task=getState().tasks[todolistId].find(el=>el.id===taskId)
     debugger
     if (task){
         const updatedTask:UpdatedTaskType={
