@@ -2,7 +2,7 @@ export type isLoadingType = "idle" | "loading" | "successfully" | "failed"
 
 const InitialAppState = {
     isLoading: "idle" as isLoadingType,
-    isError: "null" as string | null
+    isError: null as string | null
 }
 export type InitialAppStateType = typeof InitialAppState
 

@@ -1,7 +1,7 @@
 import {FilterValuesType} from '../App';
 import {todolistAPI, TodolistDomainType, TodolistType} from "../api/todolist-api";
 import {Dispatch} from "redux";
-import {changeIsLoadingAC} from "./app-reducer";
+import {changeAppErrorAC, changeIsLoadingAC} from "./app-reducer";
 
 export type RemoveTodolistActionType = {
     type: 'REMOVE-TODOLIST',
@@ -105,6 +105,13 @@ export const createTodolistTC = (newTitle: string) => (dispatch: Dispatch) => {
             if (res.data.resultCode===0){
                 dispatch(addTodolistAC(res.data.data.item))
                 dispatch(changeIsLoadingAC("successfully"))
+            } else {
+                if(res.data.messages.length){
+                    dispatch(changeAppErrorAC(res.data.messages[0]))
+                }else{
+                    dispatch(changeAppErrorAC("Some error occurred"))
+                }
+                dispatch(changeIsLoadingAC("failed"))
             }
         })
 }

@@ -3,7 +3,7 @@ import {TasksStateType} from '../App';
 import {Dispatch} from "redux";
 import {taskApi, TaskStatuses, TaskType, UpdatedTaskType} from "../api/todolist-api";
 import {AppRootStateType} from "./store";
-import {changeIsLoadingAC} from "./app-reducer";
+import {changeAppErrorAC, changeIsLoadingAC} from "./app-reducer";
 
 export type RemoveTaskActionType = {
     type: 'REMOVE-TASK',
@@ -123,9 +123,22 @@ export const removeTaskTC = (todolistId: string, taskId: string) => (dispatch: D
         })
 }
 export const addTaskTC = (todolistId: string, newTitle: string) => (dispatch: Dispatch) => {
+    dispatch(changeIsLoadingAC("loading"))
     taskApi.createTask(todolistId, newTitle)
         .then((res) => {
-            dispatch(addTaskAC(res.data.data.item, todolistId))
+            if(res.data.resultCode===0){
+                dispatch(addTaskAC(res.data.data.item, todolistId))
+                dispatch(changeIsLoadingAC("successfully"))
+            }
+            else{
+                if (res.data.messages.length){
+                    dispatch(changeAppErrorAC(res.data.messages[0]))
+                } else{
+                    dispatch(changeAppErrorAC("Some error occurred"))
+                }
+                dispatch(changeIsLoadingAC("failed"))
+            }
+
         })
 }
 export const updateTaskTitleTC = (todolistId: string, taskId: string, title: string) => (dispatch: Dispatch, getState: () => AppRootStateType) => {
