@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect} from 'react'
 import './App.css';
-import { Todolist } from './Todolist';
-import { AddItemForm } from './AddItemForm';
+import {Todolist} from './Todolist';
+import {AddItemForm} from './AddItemForm';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -10,23 +10,16 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import { Menu } from '@mui/icons-material';
+import {Menu} from '@mui/icons-material';
 import {
-    addTodolistAC,
     changeTodolistFilterAC,
-    changeTodolistTitleAC,
-    removeTodolistAC, fetchTodolistsTC
+     createTodolistTC,
+    fetchTodolistsTC,
+     removeTodolistTC, updateTodolistTitleTC
 } from './state/todolists-reducer';
-import {
-    addTaskAC,
-    addTaskTC,
-    changeTaskStatusAC,
-    changeTaskTitleAC,
-    removeTaskAC,
-    removeTaskTC, updateTaskTitleTC
-} from './state/tasks-reducer';
-import { useAppDispatch, useAppSelector} from './state/store';
-import {TaskType, TodolistDomainType} from "./api/todolist-api";
+import {addTaskTC, removeTaskTC, updateTaskStatusTC, updateTaskTitleTC} from './state/tasks-reducer';
+import {useAppDispatch, useAppSelector} from './state/store';
+import {TaskStatuses, TaskType, TodolistDomainType} from "./api/todolist-api";
 
 
 export type FilterValuesType = 'all' | 'active' | 'completed';
@@ -55,8 +48,13 @@ function App() {
     }, []);
 
     const changeStatus = useCallback(function (id: string, isDone: boolean, todolistId: string) {
-        const action = changeTaskStatusAC(id, isDone, todolistId);
-        dispatch(action);
+        // const action = changeTaskStatusAC(id, isDone, todolistId);
+        if (isDone){
+            dispatch(updateTaskStatusTC(todolistId,id,TaskStatuses.completed));
+        }else{
+            dispatch(updateTaskStatusTC(todolistId,id,TaskStatuses.inProgress));
+        }
+
     }, []);
 
     const changeTaskTitle = useCallback(function (id: string, newTitle: string, todolistId: string) {
@@ -70,18 +68,16 @@ function App() {
     }, []);
 
     const removeTodolist = useCallback(function (id: string) {
-        const action = removeTodolistAC(id);
-        dispatch(action);
+        dispatch(removeTodolistTC(id));
     }, []);
 
     const changeTodolistTitle = useCallback(function (id: string, title: string) {
-        const action = changeTodolistTitleAC(id, title);
-        dispatch(action);
+        dispatch(updateTodolistTitleTC(id,title));
     }, []);
 
     const addTodolist = useCallback((title: string) => {
-        const action = addTodolistAC(title);
-        dispatch(action);
+        // const action = addTodolistAC(title);
+        dispatch(createTodolistTC(title));
     }, [dispatch]);
 
     return (

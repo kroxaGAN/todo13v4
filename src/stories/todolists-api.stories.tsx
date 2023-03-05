@@ -1,17 +1,9 @@
 import React, {useEffect, useState} from 'react'
-import axios from "axios";
 import {taskApi, todolistAPI, UpdatedTaskType} from "../api/todolist-api";
-import {text} from "stream/consumers";
 
 export default {
     title: 'API'
 }
-// const settings={
-//     withCredentials:true,
-//     headers:{
-//         "API-KEY":"26fb8af1-3e7d-4c3b-ab20-99c24ecae36c"
-//     }
-// }
 
 export const GetTodolists = () => {
     const [state, setState] = useState<any>(null)
@@ -138,7 +130,6 @@ export const UpdateTask = () => {
         const taskId='da122bbf-32d8-4ea1-bc81-6072edf650f5'
         const updatedTask:UpdatedTaskType={
             title:"NEWWWWW TASK",
-            completed:false,
             deadline:"2023-03-02T18:58:50.937",
             description:"sdadsasdasd,",
             priority:1,
