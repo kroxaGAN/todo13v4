@@ -22,6 +22,7 @@ import {useAppDispatch, useAppSelector} from './state/store';
 import {TaskStatuses, TaskType, TodolistDomainType} from "./api/todolist-api";
 import LinearProgress from "@mui/material/LinearProgress";
 import {isLoadingType} from "./state/app-reducer";
+import ErrorSnackbar from "./components/ErrorSnackbar";
 
 
 export type FilterValuesType = 'all' | 'active' | 'completed';
@@ -128,6 +129,7 @@ function App() {
                     }
                 </Grid>
             </Container>
+            <ErrorSnackbar/>
         </div>
     );
 }
