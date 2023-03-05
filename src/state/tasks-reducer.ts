@@ -3,6 +3,7 @@ import {TasksStateType} from '../App';
 import {Dispatch} from "redux";
 import {taskApi, TaskStatuses, TaskType, UpdatedTaskType} from "../api/todolist-api";
 import {AppRootStateType} from "./store";
+import {changeIsLoadingAC} from "./app-reducer";
 
 export type RemoveTaskActionType = {
     type: 'REMOVE-TASK',
@@ -102,15 +103,23 @@ export const setTasksAC = (todolistId: string, tasks: TaskType[]) => {
 }
 
 export const setTaskTC = (todolistId: string) => (dispatch: Dispatch) => {
+    dispatch(changeIsLoadingAC("loading"))
     taskApi.getTasks(todolistId)
         .then((res) => {
             dispatch(setTasksAC(todolistId, res.data.items))
+            dispatch(changeIsLoadingAC("successfully"))
         })
 }
 export const removeTaskTC = (todolistId: string, taskId: string) => (dispatch: Dispatch) => {
+    dispatch(changeIsLoadingAC("loading"))
     taskApi.deleteTask(todolistId, taskId)
-        .then(() => {
-            dispatch(removeTaskAC(taskId, todolistId))
+        .then((res) => {
+            console.log(res.data.resultCode)
+            if (res.data.resultCode === 0){
+                dispatch(removeTaskAC(taskId, todolistId))
+                dispatch(changeIsLoadingAC("successfully"))
+            }
+
         })
 }
 export const addTaskTC = (todolistId: string, newTitle: string) => (dispatch: Dispatch) => {

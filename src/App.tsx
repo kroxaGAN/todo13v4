@@ -20,6 +20,8 @@ import {
 import {addTaskTC, removeTaskTC, updateTaskStatusTC, updateTaskTitleTC} from './state/tasks-reducer';
 import {useAppDispatch, useAppSelector} from './state/store';
 import {TaskStatuses, TaskType, TodolistDomainType} from "./api/todolist-api";
+import LinearProgress from "@mui/material/LinearProgress";
+import {isLoadingType} from "./state/app-reducer";
 
 
 export type FilterValuesType = 'all' | 'active' | 'completed';
@@ -34,6 +36,7 @@ function App() {
     const todolists = useAppSelector<Array<TodolistDomainType>>(state => state.todolists)
     const tasks = useAppSelector<TasksStateType>(state => state.tasks)
     const dispatch = useAppDispatch();
+    const isLoading=useAppSelector<isLoadingType>(state=>state.app.isLoading)
 
     useEffect(()=>{
        dispatch(fetchTodolistsTC())
@@ -93,6 +96,8 @@ function App() {
                     <Button color="inherit">Login</Button>
                 </Toolbar>
             </AppBar>
+            {isLoading==="loading" && <LinearProgress color="secondary" />}
+
             <Container fixed>
                 <Grid container style={{padding: '20px'}}>
                     <AddItemForm addItem={addTodolist}/>

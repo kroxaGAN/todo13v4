@@ -1,6 +1,7 @@
 import {FilterValuesType} from '../App';
 import {todolistAPI, TodolistDomainType, TodolistType} from "../api/todolist-api";
 import {Dispatch} from "redux";
+import {changeIsLoadingAC} from "./app-reducer";
 
 export type RemoveTodolistActionType = {
     type: 'REMOVE-TODOLIST',
@@ -83,8 +84,10 @@ export const setTodolistsAC = (todolists: TodolistType[]) => {
 }
 
 export const fetchTodolistsTC = () => (dispatch: Dispatch) => {
+    dispatch(changeIsLoadingAC("loading"))
     todolistAPI.getTodolists()
         .then((res) => {
+            dispatch(changeIsLoadingAC("successfully"))
             dispatch(setTodolistsAC(res.data))
         })
 }
@@ -96,9 +99,13 @@ export const removeTodolistTC = (todolistId: string) => (dispatch: Dispatch) => 
 }
 
 export const createTodolistTC = (newTitle: string) => (dispatch: Dispatch) => {
+    dispatch(changeIsLoadingAC("loading"))
     todolistAPI.createTodolist(newTitle)
         .then((res) => {
-            dispatch(addTodolistAC(res.data.data.item))
+            if (res.data.resultCode===0){
+                dispatch(addTodolistAC(res.data.data.item))
+                dispatch(changeIsLoadingAC("successfully"))
+            }
         })
 }
 export const updateTodolistTitleTC = (todolistId: string, newTitle: string) => (dispatch: Dispatch) => {

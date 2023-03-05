@@ -81,7 +81,7 @@ type ResponseGetTasksType = {
 }
 
 export type ResponseTasksType<T = {}> = {
-    resultCode: string
+    resultCode: number
     messages: string[]
     fieldsErrors: []
     data: T
