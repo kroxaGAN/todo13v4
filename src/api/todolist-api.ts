@@ -1,5 +1,6 @@
 import axios from "axios";
 import {FilterValuesType} from "../App";
+import {isLoadingType} from "../state/app-reducer";
 
 
 // const settings={
@@ -94,7 +95,8 @@ export type TodolistType = {
     "order": number
 }
 export type TodolistDomainType = TodolistType & {
-    filter: FilterValuesType
+    filter: FilterValuesType,
+    entityStatus:isLoadingType
 }
 
 type ResponseType<T = {}> = {

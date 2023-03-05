@@ -9,6 +9,7 @@ import { FilterValuesType } from './App';
 import {TaskStatuses, TaskType} from "./api/todolist-api";
 import {useAppDispatch} from "./state/store";
 import {setTaskTC} from "./state/tasks-reducer";
+import {isLoadingType} from "./state/app-reducer";
 
 // export type TaskType = {
 //     id: string
@@ -28,12 +29,14 @@ type PropsType = {
     removeTodolist: (id: string) => void
     changeTodolistTitle: (id: string, newTitle: string) => void
     filter: FilterValuesType
-
+    entityStatus:isLoadingType
 }
 
 export const Todolist = React.memo(function (props: PropsType) {
     console.log('Todolist called')
+
         const dispatch=useAppDispatch()
+
     useEffect(()=>{
         dispatch(setTaskTC(props.id))
     },[])
@@ -65,11 +68,11 @@ export const Todolist = React.memo(function (props: PropsType) {
 
     return <div>
         <h3><EditableSpan value={props.title} onChange={changeTodolistTitle}/>
-            <IconButton onClick={removeTodolist}>
+            <IconButton onClick={removeTodolist} disabled={props.entityStatus==="loading"}>
                 <Delete/>
             </IconButton>
         </h3>
-        <AddItemForm addItem={addTask}/>
+        <AddItemForm addItem={addTask} disabled={props.entityStatus==="loading"}/>
         <div>
             {
                 tasksForTodolist.map(t => <Task key={t.id} task={t} todolistId={props.id}
