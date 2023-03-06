@@ -4,6 +4,8 @@ import {Dispatch} from "redux";
 import {taskApi, TaskStatuses, TaskType, UpdatedTaskType} from "../api/todolist-api";
 import {AppRootStateType} from "./store";
 import {changeAppErrorAC, changeIsLoadingAC} from "./app-reducer";
+import {AxiosError} from "axios";
+import {handleServerAppError, handleServerNetvorkError} from "../utils/error-utils";
 
 export type RemoveTaskActionType = {
     type: 'REMOVE-TASK',
@@ -44,7 +46,7 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
             return copyState
         }
         case 'REMOVE-TASK': {
-            return {...state,[action.todolistId]:state[action.todolistId].filter(el=>el.id!==action.taskId)}
+            return {...state, [action.todolistId]: state[action.todolistId].filter(el => el.id !== action.taskId)}
         }
         case 'ADD-TASK': {
             const stateCopy = {...state}
@@ -54,9 +56,11 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
             }
         }
         case 'CHANGE-TASK-STATUS': {
-            return {...state, [action.todolistId]:state[action.todolistId].map(el=>el.id===action.taskId
-                ?{...el, status:action.task.status }
-                :el)}
+            return {
+                ...state, [action.todolistId]: state[action.todolistId].map(el => el.id === action.taskId
+                    ? {...el, status: action.task.status}
+                    : el)
+            }
 
         }
         case 'CHANGE-TASK-TITLE': {
@@ -90,8 +94,8 @@ export const removeTaskAC = (taskId: string, todolistId: string): RemoveTaskActi
 export const addTaskAC = (newTask: TaskType, todolistId: string) => {
     return {type: 'ADD-TASK', newTask, todolistId} as const
 }
-export const changeTaskStatusAC = (todolistId: string,taskId: string, task:TaskType ) => {
-    return {type: 'CHANGE-TASK-STATUS', todolistId, taskId, task }as const
+export const changeTaskStatusAC = (todolistId: string, taskId: string, task: TaskType) => {
+    return {type: 'CHANGE-TASK-STATUS', todolistId, taskId, task} as const
 }
 export const changeTaskTitleAC = (todolistId: string, task: TaskType) => {
     return {type: 'CHANGE-TASK-TITLE', todolistId, task} as const
@@ -109,36 +113,39 @@ export const setTaskTC = (todolistId: string) => (dispatch: Dispatch) => {
             dispatch(setTasksAC(todolistId, res.data.items))
             dispatch(changeIsLoadingAC("successfully"))
         })
+        .catch((err: AxiosError) => {
+            handleServerNetvorkError(dispatch, err)
+        })
 }
 export const removeTaskTC = (todolistId: string, taskId: string) => (dispatch: Dispatch) => {
     dispatch(changeIsLoadingAC("loading"))
     taskApi.deleteTask(todolistId, taskId)
         .then((res) => {
             console.log(res.data.resultCode)
-            if (res.data.resultCode === 0){
+            if (res.data.resultCode === 0) {
                 dispatch(removeTaskAC(taskId, todolistId))
                 dispatch(changeIsLoadingAC("successfully"))
+            }else {
+                handleServerAppError(dispatch, res.data)
             }
-
+        })
+        .catch((err: AxiosError) => {
+            handleServerNetvorkError(dispatch, err)
         })
 }
 export const addTaskTC = (todolistId: string, newTitle: string) => (dispatch: Dispatch) => {
     dispatch(changeIsLoadingAC("loading"))
     taskApi.createTask(todolistId, newTitle)
         .then((res) => {
-            if(res.data.resultCode===0){
+            if (res.data.resultCode === 0) {
                 dispatch(addTaskAC(res.data.data.item, todolistId))
                 dispatch(changeIsLoadingAC("successfully"))
+            } else {
+                handleServerAppError(dispatch, res.data)
             }
-            else{
-                if (res.data.messages.length){
-                    dispatch(changeAppErrorAC(res.data.messages[0]))
-                } else{
-                    dispatch(changeAppErrorAC("Some error occurred"))
-                }
-                dispatch(changeIsLoadingAC("failed"))
-            }
-
+        })
+        .catch((err: AxiosError) => {
+            handleServerNetvorkError(dispatch, err)
         })
 }
 export const updateTaskTitleTC = (todolistId: string, taskId: string, title: string) => (dispatch: Dispatch, getState: () => AppRootStateType) => {
@@ -154,7 +161,18 @@ export const updateTaskTitleTC = (todolistId: string, taskId: string, title: str
         }
         taskApi.updateTask(todolistId, taskId, updatedTask)
             .then((res) => {
-                dispatch(changeTaskTitleAC(todolistId, res.data.data.item))
+                if (res.data.resultCode === 0) {
+                    dispatch(changeTaskTitleAC(todolistId, res.data.data.item))
+                } else {
+                    if (res.data.messages.length) {
+                        dispatch(changeAppErrorAC(res.data.messages[0]))
+                    } else {
+                        handleServerAppError(dispatch, res.data)
+                    }
+                }
+            })
+            .catch((err) => {
+                handleServerNetvorkError(dispatch, err)
             })
     }
 
@@ -173,7 +191,14 @@ export const updateTaskStatusTC = (todolistId: string, taskId: string, statusTas
         }
         taskApi.updateTask(todolistId, taskId, updatedTask)
             .then((res) => {
-                dispatch(changeTaskStatusAC(todolistId,taskId,res.data.data.item))
+                if(res.data.resultCode===0){
+                    dispatch(changeTaskStatusAC(todolistId, taskId, res.data.data.item))
+                } else{
+                    handleServerAppError(dispatch, res.data)
+                }
+            })
+            .catch((err: AxiosError) => {
+                handleServerNetvorkError(dispatch, err)
             })
     }
 }

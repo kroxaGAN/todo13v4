@@ -1,7 +1,9 @@
 import {FilterValuesType} from '../App';
 import {todolistAPI, TodolistDomainType, TodolistType} from "../api/todolist-api";
 import {Dispatch} from "redux";
-import {changeAppErrorAC, changeIsLoadingAC, isLoadingType} from "./app-reducer";
+import {changeIsLoadingAC, isLoadingType} from "./app-reducer";
+import {AxiosError} from "axios";
+import {handleServerAppError, handleServerNetvorkError} from "../utils/error-utils";
 
 export type RemoveTodolistActionType = {
     type: 'REMOVE-TODOLIST',
@@ -95,14 +97,24 @@ export const fetchTodolistsTC = () => (dispatch: Dispatch) => {
             dispatch(changeIsLoadingAC("successfully"))
             dispatch(setTodolistsAC(res.data))
         })
+        .catch((err: AxiosError) => {
+            handleServerNetvorkError(dispatch, err)
+        })
 }
 export const removeTodolistTC = (todolistId: string) => (dispatch: Dispatch) => {
     dispatch(changeIsLoadingAC("loading"))
     dispatch(changeEntityStatusAC(todolistId,"loading"))
     todolistAPI.deleteTodolist(todolistId)
-        .then(() => {
-            dispatch(removeTodolistAC(todolistId))
-            dispatch(changeIsLoadingAC("successfully"))
+        .then((res) => {
+            if(res.data.resultCode===0){
+                dispatch(removeTodolistAC(todolistId))
+                dispatch(changeIsLoadingAC("successfully"))
+            } else {
+                handleServerAppError(dispatch, res.data)
+            }
+        })
+        .catch((err: AxiosError) => {
+            handleServerNetvorkError(dispatch, err)
         })
 }
 
@@ -114,18 +126,25 @@ export const createTodolistTC = (newTitle: string) => (dispatch: Dispatch) => {
                 dispatch(addTodolistAC(res.data.data.item))
                 dispatch(changeIsLoadingAC("successfully"))
             } else {
-                if (res.data.messages.length) {
-                    dispatch(changeAppErrorAC(res.data.messages[0]))
-                } else {
-                    dispatch(changeAppErrorAC("Some error occurred"))
-                }
-                dispatch(changeIsLoadingAC("failed"))
+                handleServerAppError(dispatch, res.data)
             }
+        })
+        .catch((err: AxiosError) => {
+            handleServerNetvorkError(dispatch, err)
         })
 }
 export const updateTodolistTitleTC = (todolistId: string, newTitle: string) => (dispatch: Dispatch) => {
+    dispatch(changeIsLoadingAC("loading"))
     todolistAPI.updateTodolistTitle(todolistId, newTitle)
-        .then(() => {
-            dispatch(changeTodolistTitleAC(todolistId, newTitle))
+        .then((res) => {
+            if(res.data.resultCode===0){
+                dispatch(changeTodolistTitleAC(todolistId, newTitle))
+                dispatch(changeIsLoadingAC("successfully"))
+            }else {
+                handleServerAppError(dispatch, res.data)
+            }
+        })
+        .catch((err: AxiosError) => {
+            handleServerNetvorkError(dispatch, err)
         })
 }
